@@ -1,0 +1,35 @@
+#include <Servo.h>
+int rollerPin1 = 4;
+int motorPin = 3;
+int rollerPin2 = 2;
+Servo motor;
+Servo roller1;
+Servo roller2;
+
+void setup() {
+  pinMode(motorPin, OUTPUT);
+  motor.attach(motorPin);
+  pinMode(rollerPin1, OUTPUT);
+  roller1.attach(rollerPin1);
+  pinMode(rollerPin2, OUTPUT);
+  roller2.attach(rollerPin2);
+}
+
+void loop() {
+  roller1Control(100);
+  roller2Control(-90);
+  motorControl(-90);
+  delay(1000);
+  motorControl(90);
+  delay (1000);
+//  roller1Control(100);
+}
+int motorControl(int val) {
+  motor.write(map(val, -100, 100, 1000, 2000));
+}
+int roller1Control( int val) {
+  roller1.write(map(val, -100, 100, 1000, 2000));
+}
+int roller2Control( int val) {
+  roller2.write(map(val, -100, 100, 1000, 2000));
+}
