@@ -1,0 +1,52 @@
+import cv2
+import numpy as np
+import serial
+import time
+#captures video through webcam
+cap = cv2.VideoCapture(0)
+#sets video dimensions
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+#sets up serial communication link
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout = 1.0)
+time.sleep(3)
+ser.reset_input_buffer()
+
+
+while True:
+    #frame is the image
+    _,frame = cap.read()
+    #converts brg to hsv
+    hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    #centers the pixel detector in the middle of the frame
+    height, width, _ = frame.shape
+    
+    cx = int(width / 2)
+    cy = int(height / 2)
+    #creates center pixel val
+    pixel_center = hsv_frame[cy, cx]
+    hue_value = pixel_center[0]
+    color = "UNDEFINED"
+    #conditional statements to decide whether pixel is black or red
+    if 100 < hue_value < 130:
+        color = "black"
+    if 160 < hue_value < 190:
+        color = "red"
+        #sends message containing color to arduino
+    if color == "red" :
+         ser.write("r\n".encode('utf-8'))
+    if color == "black":
+         ser.write("b\n".encode('utf-8'))
+    
+    print(color)
+    
+    cv2.circle(frame, (cx, cy), 5, (255, 0,0), 3)
+    
+    cv2.imshow("Frame", frame)
+    
+    key = cv2.waitKey(1)
+    if key == 27:
+        break
+    
+cap.release()
+cv2.destroyAllWindows()
