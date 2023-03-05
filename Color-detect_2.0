@@ -1,7 +1,7 @@
 import cv2
 from statistics import mean
 import numpy as np
-#import serial
+import serial
 import time
 
 # captures video through webcam
@@ -9,49 +9,51 @@ cap = cv2.VideoCapture(0)
 # sets video dimensions
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-# sets up serial communication link
-#ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1.0)
-#time.sleep(3)
-#ser.reset_input_buffer()
+#sets up serial communication link
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1.0)
+time.sleep(3)
+ser.reset_input_buffer()
 
 while True:
     # frame is the image
     _, frame = cap.read()
 
-    cropped_frame = frame[500:700 , 800:1000]
+    cropped_frame = frame[400:700 , 750:1050]
     # converts brg to hsv
     hsv_frame = cv2.cvtColor(cropped_frame, cv2.COLOR_BGR2HSV)
 
     hue_array = []
-    for x in range(0,199):
-        for y in range(0,199):
-            hue_array.append(hsv_frame[x,y][0])
+    #traverses through all pixels in image
+    for x in range(0,299):
+        for y in range(0,299):
+            #filters the pixels, only black and red pixels included into array
+            if hsv_frame[x,y][0] > 125:
+                hue_array.append(hsv_frame[x,y][0])
 
-    # centers the pixel detector in the middle of the frame
-    height, width, _ = cropped_frame.shape
+   #takes average of the hue array vals
     hue_avg = mean(hue_array)
 
-    cx = int(width / 2)
-    cy = int(height / 2)
-    # creates center pixel val
+   
 
     color = "UNDEFINED"
     # conditional statements to decide whether pixel is black or red
-    if 110 < hue_avg < 135:
+    if 125 < hue_avg < 140:
         color = "black"
-    if 135 < hue_avg < 170:
+    if 140 < hue_avg < 170:
         color = "red"
         # sends message containing color to arduino
-    #if color == "red":
-    #    ser.write("r\n".encode('utf-8'))
-   # if color == "black":
-      #  ser.write("b\n".encode('utf-8'))
+    if color == "red":
+        ser.write("r\n".encode('utf-8'))
+    if color == "black":
+        ser.write("b\n".encode('utf-8'))
 
 
     print(hue_avg)
-    cv2.imshow(" Cropped Frame", cropped_frame)
-
     print(color)
+    cv2.imshow(" Cropped Frame", cropped_frame)
+    cv2.waitKey(0)
+    time.sleep(2)
+    
     break
 #
 # cap.release()
