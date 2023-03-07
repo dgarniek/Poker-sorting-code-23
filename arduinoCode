@@ -23,8 +23,18 @@ void loop() {
   //Serial.println(count);
   
 
-  //roller1Control(100);
-
+  roller1Control(100);
+/*
+  if (count % 2 == 1) {
+    delay(500);
+    down();
+  }
+ // Serial.println(count);
+  if (count % 2 == 0) {
+    delay(500);
+    up();
+  }
+  */
   
   sortRed();
   sortRed();
@@ -55,7 +65,7 @@ void sortBlack() {
   //motor moves the card
   motorControl(0);
   motorControl(-40);
-  delay(300);
+  delay(450);
   motorControl(20);
   delay(170);
   motorControl(0);
@@ -74,7 +84,7 @@ void sortRed() {
   
   //motor moves the card
   motorControl(-40);
-  delay(300);
+  delay(450);
   motorControl(20);
   delay(170);
   motorControl(0);
