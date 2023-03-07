@@ -1,0 +1,84 @@
+#include <Servo.h>
+int rollerPin1 = 4;
+int motorPin = 3;
+int elevatorPin = 2;
+
+Servo motor;
+Servo roller1;
+Servo elevator;
+int count = 1;
+int elevatorPos = 1;
+
+void setup() {
+  pinMode(motorPin, OUTPUT);
+  motor.attach(motorPin);
+  pinMode(rollerPin1, OUTPUT);
+  roller1.attach(rollerPin1);
+  pinMode(elevatorPin, OUTPUT);
+  elevator.attach(elevatorPin);
+  Serial.begin(9600);
+}
+
+void loop() {
+  //Serial.println(count);
+  
+
+  //roller1Control(100);
+
+  
+  sortRed();
+  sortRed();
+  sortBlack();
+  sortBlack();
+}
+
+int motorControl(int val) {
+  motor.write(map(val, -100, 100, 1000, 2000));
+}
+int roller1Control( int val) {
+  roller1.write(map(val, -100, 100, 1000, 2000));
+}
+int elevatorControl( int val) {
+  elevator.write(map(val, -100, 100, 1000, 2000));
+}
+
+void sortBlack() {
+  //checks to see if elevator is in the wrong position, moves if so
+  if(elevatorPos == 0) {
+  elevatorControl(0);
+  
+  elevatorControl(-40);
+  delay(450);
+  elevatorControl(0); 
+ }
+
+  //motor moves the card
+  motorControl(0);
+  motorControl(-40);
+  delay(300);
+  motorControl(20);
+  delay(170);
+  motorControl(0);
+  
+  //updates the current position
+  elevatorPos = 1;
+}
+
+void sortRed() {
+  //checks to see if elevator is in the wrong position, moves if so
+  if (elevatorPos == 1) {
+  elevatorControl(30);
+  delay(390);
+  elevatorControl(0);
+  }
+  
+  //motor moves the card
+  motorControl(-40);
+  delay(300);
+  motorControl(20);
+  delay(170);
+  motorControl(0);
+ 
+  //updates the current position
+  elevatorPos = 0;
+}
