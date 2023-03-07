@@ -37,9 +37,13 @@ void loop() {
   */
   
   sortRed();
+  delay(1000);
   sortRed();
+  delay(1000);
   sortBlack();
+  delay(1000);
   sortBlack();
+  delay(1000);
 }
 
 int motorControl(int val) {
@@ -65,9 +69,9 @@ void sortBlack() {
   //motor moves the card
   motorControl(0);
   motorControl(-40);
-  delay(450);
-  motorControl(20);
-  delay(170);
+  delay(375);
+  motorControl(30);
+  delay(200);
   motorControl(0);
   
   //updates the current position
@@ -84,9 +88,9 @@ void sortRed() {
   
   //motor moves the card
   motorControl(-40);
-  delay(450);
-  motorControl(20);
-  delay(170);
+  delay(375);
+  motorControl(30);
+  delay(200);
   motorControl(0);
  
   //updates the current position
