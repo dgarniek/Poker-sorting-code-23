@@ -1,60 +1,73 @@
 import cv2
 from statistics import mean
-import numpy as np
-import serial
 import time
+    #import numpy as np
+import serial
 
-# captures video through webcam
+
+    # captures video through webcam
 cap = cv2.VideoCapture(0)
-# sets video dimensions
+    # sets video dimensions
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-#sets up serial communication link
+    #sets up serial communication link
 ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1.0)
 time.sleep(3)
 ser.reset_input_buffer()
 
 while True:
-    # frame is the image
-    _, frame = cap.read()
+        # frame is the image
+        _, frame = cap.read()
 
-    cropped_frame = frame[400:700 , 750:1050]
-    # converts brg to hsv
-    hsv_frame = cv2.cvtColor(cropped_frame, cv2.COLOR_BGR2HSV)
+        cropped_frame = frame[50:350 ,700:1000]
+       
+        
 
-    hue_array = []
-    #traverses through all pixels in image
-    for x in range(0,299):
-        for y in range(0,299):
-            #filters the pixels, only black and red pixels included into array
-            if hsv_frame[x,y][0] > 125:
-                hue_array.append(hsv_frame[x,y][0])
+        red_array = []
+        blue_array = []
+        #traverses through all pixels in image
+        for x in range(0,299):
+            for y in range(0,299):
+                #filters the pixels, only black and red pixels included into array
+                if cropped_frame[x,y][2] > 120 and cropped_frame[x,y][1] < 120:
+                    red_array.append(cropped_frame[x,y][2])
+                if cropped_frame[x,y][2] < 100 and cropped_frame[x,y][1] < 100:
+                    red_array.append(cropped_frame[x,y][2])
+                if cropped_frame[x,y][0] > 150 and cropped_frame[x,y][1] < 100:
+                    blue_array.append(cropped_frame[x,y][0])
+                
+                
 
-   #takes average of the hue array vals
-    hue_avg = mean(hue_array)
+       #takes average of the hue array vals
+        red_avg = mean(red_array)
+        blue_avg = 0
+        if len(blue_array) > 1:
+            blue_avg = mean(blue_array)
+       
 
-   
+        color = "UNDEFINED"
+        # conditional statements to decide whether pixel is black or red
+        if  red_avg < 80 and blue_avg <160:
+            color = "black"
+        if 80 <= red_avg and blue_avg < 160:
+            color = "red"
+            
+        if blue_avg > 160: 
+            break
+        if color == "red":
+            ser.write("r\n".encode('utf-8'))
+        if color == "black":
+            ser.write("b\n".encode('utf-8'))
+            
 
-    color = "UNDEFINED"
-    # conditional statements to decide whether pixel is black or red
-    if 125 < hue_avg < 140:
-        color = "black"
-    if 140 < hue_avg < 170:
-        color = "red"
-        # sends message containing color to arduino
-    if color == "red":
-        ser.write("r\n".encode('utf-8'))
-    if color == "black":
-        ser.write("b\n".encode('utf-8'))
+        print(red_avg)
+        print(color)
+        
+        time.sleep(2)
+        
+       
+    #
+    # cap.release()
+    # cv2.destroyAllWindows()
 
 
-    print(hue_avg)
-    print(color)
-    cv2.imshow(" Cropped Frame", cropped_frame)
-    cv2.waitKey(0)
-    time.sleep(2)
-    
-    break
-#
-# cap.release()
-# cv2.destroyAllWindows()
