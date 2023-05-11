@@ -1,7 +1,7 @@
 import cv2
 from statistics import mean
 import time
-    #import numpy as np
+    
 import serial
 
 
@@ -18,7 +18,7 @@ ser.reset_input_buffer()
 while True:
         # frame is the image
         _, frame = cap.read()
-
+        #crops the frame
         cropped_frame = frame[50:350 ,700:1000]
        
         
@@ -33,14 +33,17 @@ while True:
                     red_array.append(cropped_frame[x,y][2])
                 if cropped_frame[x,y][2] < 100 and cropped_frame[x,y][1] < 100:
                     red_array.append(cropped_frame[x,y][2])
+                    
+                    #adds all blue pixels to blue array
                 if cropped_frame[x,y][0] > 150 and cropped_frame[x,y][1] < 100:
                     blue_array.append(cropped_frame[x,y][0])
                 
                 
 
-       #takes average of the hue array vals
+       #takes average of the array vals
         red_avg = mean(red_array)
         blue_avg = 0
+        #sometimes, there are no blue pixels and there is a statistics error, that is why there is an if statement
         if len(blue_array) > 1:
             blue_avg = mean(blue_array)
        
@@ -51,9 +54,11 @@ while True:
             color = "black"
         if 80 <= red_avg and blue_avg < 160:
             color = "red"
-            
+         # if the camera recognized the blue cap, it stops the program
         if blue_avg > 160: 
             break
+            
+         # pi communicates the card type with arduino
         if color == "red":
             ser.write("r\n".encode('utf-8'))
         if color == "black":
@@ -66,8 +71,5 @@ while True:
         time.sleep(2)
         
        
-    #
-    # cap.release()
-    # cv2.destroyAllWindows()
-
+    
 
